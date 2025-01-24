@@ -1,1 +1,1 @@
-export * from './validate-errors';
+export * from './handle-db-errors';
