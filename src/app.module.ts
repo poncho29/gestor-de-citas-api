@@ -7,6 +7,7 @@ import { typeOrmConfig } from './config/typeorm.config';
 import { CommonModule } from './common/common.module';
 import { ServicesModule } from './services/services.module';
 import { CustomersModule } from './customers/customers.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { CustomersModule } from './customers/customers.module';
     CommonModule,
     ServicesModule,
     CustomersModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],

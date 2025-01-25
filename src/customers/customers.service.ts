@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { FindManyOptions, ILike, Repository } from 'typeorm';
@@ -20,6 +24,18 @@ export class CustomersService {
 
   async create(createCustomerDto: CreateCustomerDto) {
     try {
+      const existingCustomer = await this.customerRepository.findOne({
+        where: {
+          phone: createCustomerDto.phone,
+          user_id: createCustomerDto.user_id,
+        },
+      });
+
+      if (existingCustomer)
+        throw new ConflictException(
+          'Ya existe un cliente con este número de teléfono para el usuario actual.',
+        );
+
       const customer = this.customerRepository.create(createCustomerDto);
       return await this.customerRepository.save(customer);
     } catch (error) {
