@@ -4,9 +4,12 @@ import {
   DeleteDateColumn,
   Entity,
   Index,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
+import { AppointmentService } from '../../appointments/entities/appointment-service.entity';
 
 @Entity({ name: 'services' })
 export class Service {
@@ -34,4 +37,11 @@ export class Service {
 
   @DeleteDateColumn()
   deleted_at: Date;
+
+  // Relations
+  @OneToMany(
+    () => AppointmentService,
+    (appointmentService) => appointmentService.service,
+  )
+  appointmentServices: AppointmentService[];
 }

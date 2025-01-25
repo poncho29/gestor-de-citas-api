@@ -7,9 +7,11 @@ import {
   DeleteDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 
 import { User } from '../../users/entities/user.entity';
+import { Appointment } from '../../appointments/entities/appointment.entity';
 
 @Entity('customers')
 export class Customer {
@@ -41,4 +43,7 @@ export class Customer {
   @ManyToOne(() => User, (user) => user.customers)
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @OneToMany(() => Appointment, (appointment) => appointment.customer)
+  appointments: Appointment[];
 }
