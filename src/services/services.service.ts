@@ -42,15 +42,18 @@ export class ServicesService {
       };
     }
 
-    const [permissions, total] =
+    const [services, total] =
       await this.serviceRepository.findAndCount(findOptions);
 
-    return { permissions, total };
+    return { services, total };
   }
 
   async findOne(id: string) {
     const service = await this.serviceRepository.findOneBy({ id });
-    if (!service) throw new NotFoundException('El servicio no se encontro');
+
+    if (!service)
+      throw new NotFoundException(`El servicio con id ${id} no se encontro`);
+
     return service;
   }
 
@@ -58,6 +61,7 @@ export class ServicesService {
     try {
       const service = await this.findOne(id);
       Object.assign(service, updateServiceDto);
+
       return await this.serviceRepository.save(service);
     } catch (error) {
       handleDBErrors(error);
