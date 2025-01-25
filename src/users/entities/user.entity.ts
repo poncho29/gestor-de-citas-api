@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from 'typeorm';
 
 import { Customer } from '../../customers/entities/customer.entity';
 
@@ -16,6 +24,16 @@ export class User {
   @Column({ type: 'varchar', length: 255 })
   password: string;
 
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  updated_at: Date;
+
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deleted_at: Date;
+
+  // Relations
   @OneToMany(() => Customer, (customer) => customer.user)
   customers: Customer[];
 }

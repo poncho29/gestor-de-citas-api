@@ -2,8 +2,8 @@ import {
   IsString,
   IsNotEmpty,
   IsOptional,
-  IsPhoneNumber,
   IsEmail,
+  MinLength,
 } from 'class-validator';
 
 export class CreateCustomerDto {
@@ -13,7 +13,7 @@ export class CreateCustomerDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsPhoneNumber()
+  @MinLength(10)
   phone: string;
 
   @IsString()

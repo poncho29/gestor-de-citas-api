@@ -32,19 +32,17 @@ export class CustomersService {
       });
 
       if (existingCustomer)
-        throw new ConflictException(
-          'Ya existe un cliente con este número de teléfono para el usuario actual.',
-        );
+        throw new ConflictException('Ya existe un cliente con ese teléfono');
 
       const customer = this.customerRepository.create(createCustomerDto);
       return await this.customerRepository.save(customer);
     } catch (error) {
-      handleDBErrors(error);
+      handleDBErrors(error, { message: 'un cliente', field: 'teléfono' });
     }
   }
 
   async findAll(pagination: PaginationDto) {
-    const { limit = 10, offset = 0, search = '' } = pagination;
+    const { limit = 10, offset = 0, search = '', byUserId = '' } = pagination;
 
     const findOptions: FindManyOptions<Customer> = {
       take: limit,
@@ -55,6 +53,13 @@ export class CustomersService {
     if (search) {
       findOptions.where = {
         name: ILike(`%${search}%`),
+      };
+    }
+
+    if (byUserId) {
+      findOptions.where = {
+        ...findOptions.where,
+        user_id: byUserId,
       };
     }
 

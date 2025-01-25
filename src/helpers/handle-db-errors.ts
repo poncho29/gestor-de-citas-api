@@ -11,6 +11,7 @@ enum DBErrorCodes {
 enum HTTPStatus {
   BAD_REQUEST = 400,
   NOT_FOUND = 404,
+  CONFLICT = 409,
 }
 
 interface ErrorOptions {
@@ -22,6 +23,8 @@ interface ErrorOptions {
 export const handleDBErrors = (error: any, options: ErrorOptions = {}) => {
   const { message = '', field = 'valor', detail } = options;
 
+  console.log(error);
+
   if (error.code === DBErrorCodes.DUPLICATE_KEY) {
     throw new BadRequestException(`Ya existe ${message} con ese ${field}`);
   }
@@ -32,6 +35,10 @@ export const handleDBErrors = (error: any, options: ErrorOptions = {}) => {
 
   if (error.status === HTTPStatus.NOT_FOUND) {
     throw new NotFoundException(error.message);
+  }
+
+  if (error.status === HTTPStatus.CONFLICT) {
+    throw new BadRequestException(error.message);
   }
 
   throw new InternalServerErrorException([
