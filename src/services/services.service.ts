@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { FindManyOptions, ILike, Repository } from 'typeorm';
@@ -20,15 +24,25 @@ export class ServicesService {
 
   async create(createServiceDto: CreateServiceDto) {
     try {
+      const existingService = await this.serviceRepository.findOne({
+        where: {
+          name: createServiceDto.name,
+          user_id: createServiceDto.user_id,
+        },
+      });
+
+      if (existingService)
+        throw new ConflictException('Ya existe un servicio con ese nombre');
+
       const service = this.serviceRepository.create(createServiceDto);
       return await this.serviceRepository.save(service);
     } catch (error) {
-      handleDBErrors(error);
+      handleDBErrors(error, { message: 'un servicio', field: 'nombre' });
     }
   }
 
   async findAll(pagination: PaginationDto) {
-    const { limit = 10, offset = 0, search = '' } = pagination;
+    const { limit = 10, offset = 0, search = '', byUserId = '' } = pagination;
 
     const findOptions: FindManyOptions<Service> = {
       take: limit,
@@ -39,6 +53,13 @@ export class ServicesService {
     if (search) {
       findOptions.where = {
         name: ILike(`%${search}%`),
+      };
+    }
+
+    if (byUserId) {
+      findOptions.where = {
+        ...findOptions.where,
+        user_id: byUserId,
       };
     }
 

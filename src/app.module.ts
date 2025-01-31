@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { typeOrmConfig } from './config/typeorm.config';
 
@@ -9,6 +10,7 @@ import { ServicesModule } from './services/services.module';
 import { CustomersModule } from './customers/customers.module';
 import { UsersModule } from './users/users.module';
 import { AppointmentsModule } from './appointments/appointments.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -20,11 +22,13 @@ import { AppointmentsModule } from './appointments/appointments.module';
       useFactory: typeOrmConfig,
       inject: [ConfigService],
     }),
+    ScheduleModule.forRoot(),
     CommonModule,
     ServicesModule,
     CustomersModule,
     UsersModule,
     AppointmentsModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

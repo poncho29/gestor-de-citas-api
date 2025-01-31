@@ -1,13 +1,13 @@
-import { IsDateString, IsNotEmpty, IsUUID, IsArray } from 'class-validator';
+import { IsNotEmpty, IsUUID, IsArray, IsString } from 'class-validator';
 
 export class CreateAppointmentDto {
-  @IsDateString()
+  @IsString()
   @IsNotEmpty()
-  date: Date;
+  date: string;
 
-  @IsDateString()
+  @IsString()
   @IsNotEmpty()
-  start_time: Date;
+  start_time: string;
 
   @IsArray()
   @IsUUID('4', { each: true }) // Valida que cada elemento del arreglo sea un UUID
@@ -23,7 +23,7 @@ export class CreateAppointmentDto {
 }
 
 export class ReminderDto {
-  @IsDateString()
+  @IsString()
   @IsNotEmpty()
   reminder_time: Date;
 }

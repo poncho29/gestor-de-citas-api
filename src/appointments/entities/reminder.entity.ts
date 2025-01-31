@@ -13,7 +13,7 @@ export class Reminder {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamptz' })
   reminder_time: Date;
 
   @Column({ type: 'boolean', default: false })

@@ -4,12 +4,15 @@ import {
   DeleteDateColumn,
   Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { AppointmentService } from '../../appointments/entities/appointment-service.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity({ name: 'services' })
 export class Service {
@@ -38,7 +41,14 @@ export class Service {
   @DeleteDateColumn()
   deleted_at: Date;
 
+  @Column({ type: 'uuid' })
+  user_id: string;
+
   // Relations
+  @ManyToOne(() => User, (user) => user.customers)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+
   @OneToMany(
     () => AppointmentService,
     (appointmentService) => appointmentService.service,

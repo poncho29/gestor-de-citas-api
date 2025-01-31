@@ -6,6 +6,7 @@ import {
   IsNumber,
   Min,
   Max,
+  IsNotEmpty,
 } from 'class-validator';
 
 export class CreateServiceDto {
@@ -27,4 +28,8 @@ export class CreateServiceDto {
   @IsNumber()
   @Min(0)
   price: number;
+
+  @IsString()
+  @IsNotEmpty()
+  user_id: string;
 }

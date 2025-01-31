@@ -51,40 +51,31 @@ export class AppointmentsService {
       );
     }
 
-    // Convertir las cadenas ISO a objetos Date
-    const date = new Date(createAppointmentDto.date);
-    const startTime = new Date(createAppointmentDto.start_time);
+    // const date = new Date(createAppointmentDto.date);
+    // const startTime = new Date(createAppointmentDto.start_time);
 
-    const totalDuration = services.reduce(
-      (total, service) => total + Number(service.duration),
-      0,
-    );
-    const endTime = new Date(startTime.getTime() + totalDuration * 60000);
-    console.log({
-      endTime,
-      totalDuration,
-    });
+    // const totalDuration = services.reduce(
+    //   (total, service) => total + Number(service.duration),
+    //   0,
+    // );
+    // const endTime = new Date(startTime.getTime() + totalDuration * 60000);
 
     const appointment = this.appointmentRepository.create({
-      date,
-      start_time: startTime,
-      end_time: endTime,
+      date: new Date(createAppointmentDto.date),
+      start_time: new Date(createAppointmentDto.start_time),
+      end_time: new Date(
+        new Date(createAppointmentDto.start_time).getTime() +
+          services.reduce(
+            (total, service) => total + Number(service.duration),
+            0,
+          ) *
+            60000,
+      ),
       customer,
       reminders: createAppointmentDto.reminders.map((reminder) =>
-        this.reminderRepository.create(reminder),
-      ),
-      appointmentServices: services.map((service) =>
-        this.appointmentServiceRepository.create({ service }),
-      ),
-    });
-
-    console.log({
-      date,
-      start_time: startTime,
-      end_time: endTime,
-      customer,
-      reminders: createAppointmentDto.reminders.map((reminder) =>
-        this.reminderRepository.create(reminder),
+        this.reminderRepository.create({
+          reminder_time: new Date(reminder.reminder_time),
+        }),
       ),
       appointmentServices: services.map((service) =>
         this.appointmentServiceRepository.create({ service }),
