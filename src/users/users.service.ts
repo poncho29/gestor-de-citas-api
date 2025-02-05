@@ -6,6 +6,8 @@ import * as bcrypt from 'bcrypt';
 
 import { User } from './entities/user.entity';
 
+import { AuthService } from '../auth/auth.service';
+
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDto } from '../common/dtos';
@@ -17,6 +19,8 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
+    private readonly authService: AuthService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -31,9 +35,12 @@ export class UsersService {
       await this.userRepository.save(user);
       delete user.password;
 
-      return user;
+      return {
+        ...user,
+        token: this.authService.getJwtToken({ email: user.email }),
+      };
     } catch (error) {
-      handleDBErrors(error, { message: 'un usuario', field: 'email' });
+      handleDBErrors(error);
     }
   }
 

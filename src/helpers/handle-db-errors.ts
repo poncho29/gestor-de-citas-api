@@ -26,7 +26,8 @@ export const handleDBErrors = (error: any, options: ErrorOptions = {}) => {
   console.log(error);
 
   if (error.code === DBErrorCodes.DUPLICATE_KEY) {
-    throw new BadRequestException(`Ya existe ${message} con ese ${field}`);
+    if (!message || !field) throw new BadRequestException(error.detail);
+    else throw new BadRequestException(`Ya existe ${message} con ese ${field}`);
   }
 
   if (error.status === HTTPStatus.BAD_REQUEST) {
