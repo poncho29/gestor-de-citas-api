@@ -6,6 +6,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  BeforeInsert,
+  BeforeUpdate,
 } from 'typeorm';
 
 import { Customer } from '../../customers/entities/customer.entity';
@@ -43,4 +45,15 @@ export class User {
 
   @OneToMany(() => Customer, (customer) => customer.user)
   customers: Customer[];
+
+  // Functions
+  @BeforeInsert()
+  checkFieldsBeforeInsert() {
+    this.email = this.email.toLowerCase().trim();
+  }
+
+  @BeforeUpdate()
+  checkFieldsBeforeUpdate() {
+    this.checkFieldsBeforeInsert();
+  }
 }

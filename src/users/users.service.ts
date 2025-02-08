@@ -6,8 +6,6 @@ import * as bcrypt from 'bcrypt';
 
 import { User } from './entities/user.entity';
 
-import { AuthService } from '../auth/auth.service';
-
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDto } from '../common/dtos';
@@ -19,8 +17,6 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-
-    private readonly authService: AuthService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -35,10 +31,7 @@ export class UsersService {
       await this.userRepository.save(user);
       delete user.password;
 
-      return {
-        ...user,
-        token: this.authService.getJwtToken({ email: user.email }),
-      };
+      return user;
     } catch (error) {
       handleDBErrors(error);
     }
@@ -71,8 +64,25 @@ export class UsersService {
       withDeleted: true,
     });
 
+    if (!user) throw new NotFoundException(`Usuario con ID ${id} no existe.`);
+
+    return user;
+  }
+
+  async findOneByEmail(email: string) {
+    const user = await this.userRepository.findOne({
+      where: { email },
+      withDeleted: true,
+      select: { id: true, email: true, password: true },
+    });
+
     if (!user)
-      throw new NotFoundException(`Usuario con ID ${id} no encontrado.`);
+      throw new NotFoundException(`El usuario con email ${email} no existe.`);
+
+    if (user.deleted_at)
+      throw new NotFoundException(
+        `El usuario con email ${email} esta inactivo.`,
+      );
 
     return user;
   }
