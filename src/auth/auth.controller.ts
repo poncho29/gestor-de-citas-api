@@ -6,6 +6,10 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 
+import { GetUser } from './decorators/get-user.decorator';
+
+import { User } from '../users/entities/user.entity';
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -22,10 +26,11 @@ export class AuthController {
 
   @Get('private')
   @UseGuards(AuthGuard())
-  testingPrivateRoute() {
+  testingPrivateRoute(@GetUser() user: User) {
     return {
       ok: true,
       message: 'This is a private message',
+      user,
     };
   }
 }
