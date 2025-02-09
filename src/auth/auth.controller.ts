@@ -9,6 +9,7 @@ import { LoginAuthDto } from './dto/login-auth.dto';
 import { GetUser } from './decorators/get-user.decorator';
 
 import { User } from '../users/entities/user.entity';
+import { RawHeaders } from './decorators';
 
 @Controller('auth')
 export class AuthController {
@@ -26,11 +27,15 @@ export class AuthController {
 
   @Get('private')
   @UseGuards(AuthGuard())
-  testingPrivateRoute(@GetUser() user: User) {
+  testingPrivateRoute(
+    @GetUser() user: User,
+    @RawHeaders() rawHeaders: string[],
+  ) {
     return {
       ok: true,
       message: 'This is a private message',
       user,
+      rawHeaders,
     };
   }
 }
