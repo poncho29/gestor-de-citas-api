@@ -9,7 +9,7 @@ import {
 
 import { Observable } from 'rxjs';
 
-import { META_ROLES } from '../../decorators';
+import { META_ROLES } from '../decorators';
 
 @Injectable()
 export class UserRoleGuard implements CanActivate {

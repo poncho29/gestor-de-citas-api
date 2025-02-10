@@ -1,5 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Controller, Post, Body, Get } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
 
@@ -8,8 +7,7 @@ import { LoginAuthDto } from './dto/login-auth.dto';
 
 import { User } from '../users/entities/user.entity';
 
-import { GetUser, RawHeaders, RoleProtected } from './decorators';
-import { UserRoleGuard } from './guards/user-role/user-role.guard';
+import { Auth, GetUser } from './decorators';
 
 import { ValidRoles } from './interfaces';
 
@@ -27,24 +25,9 @@ export class AuthController {
     return this.authService.login(loginAuthDto);
   }
 
-  @Get('private')
-  @UseGuards(AuthGuard())
-  testingPrivateRoute(
-    @GetUser() user: User,
-    @RawHeaders() rawHeaders: string[],
-  ) {
-    return {
-      ok: true,
-      message: 'This is a private message',
-      user,
-      rawHeaders,
-    };
-  }
-
-  @Get('private2')
-  @RoleProtected(ValidRoles.SUPER_ADMIN)
-  @UseGuards(AuthGuard(), UserRoleGuard)
-  privateRoute2(@GetUser() user: User) {
+  @Get('private3')
+  @Auth(ValidRoles.SUPER_ADMIN, ValidRoles.ADMIN)
+  privateRoute3(@GetUser() user: User) {
     return {
       ok: true,
       user,

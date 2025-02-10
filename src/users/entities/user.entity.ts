@@ -30,6 +30,12 @@ export class User {
   @Column({ type: 'varchar', length: 255 })
   password: string;
 
+  @Column('text', {
+    array: true,
+    default: ['user'],
+  })
+  roles: string[];
+
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
