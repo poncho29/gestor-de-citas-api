@@ -9,6 +9,8 @@ import {
 
 import { Observable } from 'rxjs';
 
+import { META_ROLES } from '../../decorators';
+
 @Injectable()
 export class UserRoleGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
@@ -16,7 +18,7 @@ export class UserRoleGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const validRoles: string[] = this.reflector.get(
-      'roles',
+      META_ROLES,
       context.getHandler(),
     );
 
