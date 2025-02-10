@@ -8,18 +8,28 @@ import {
   Delete,
 } from '@nestjs/common';
 
+import { Auth, GetUser } from '../auth/decorators';
+
+import { User } from '../users/entities/user.entity';
+
 import { AppointmentsService } from './appointments.service';
 
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
+
+import { ValidRoles } from '../auth/interfaces';
 
 @Controller('appointments')
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
   @Post()
-  create(@Body() createAppointmentDto: CreateAppointmentDto) {
-    return this.appointmentsService.create(createAppointmentDto);
+  @Auth(ValidRoles.SUPER_ADMIN, ValidRoles.ADMIN)
+  create(
+    @Body() createAppointmentDto: CreateAppointmentDto,
+    @GetUser() user: User,
+  ) {
+    return this.appointmentsService.create(createAppointmentDto, user);
   }
 
   @Get()

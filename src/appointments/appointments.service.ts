@@ -8,6 +8,7 @@ import { Customer } from '../customers/entities/customer.entity';
 import { Service } from '../services/entities/service.entity';
 import { Appointment } from './entities/appointment.entity';
 import { Reminder } from './entities/reminder.entity';
+import { User } from '../users/entities/user.entity';
 
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
@@ -27,7 +28,7 @@ export class AppointmentsService {
     private readonly customerRepository: Repository<Customer>,
   ) {}
 
-  async create(createAppointmentDto: CreateAppointmentDto) {
+  async create(createAppointmentDto: CreateAppointmentDto, user: User) {
     const customer = await this.customerRepository.findOne({
       where: { id: createAppointmentDto.customer_id },
     });
@@ -51,15 +52,6 @@ export class AppointmentsService {
       );
     }
 
-    // const date = new Date(createAppointmentDto.date);
-    // const startTime = new Date(createAppointmentDto.start_time);
-
-    // const totalDuration = services.reduce(
-    //   (total, service) => total + Number(service.duration),
-    //   0,
-    // );
-    // const endTime = new Date(startTime.getTime() + totalDuration * 60000);
-
     const appointment = this.appointmentRepository.create({
       date: new Date(createAppointmentDto.date),
       start_time: new Date(createAppointmentDto.start_time),
@@ -72,6 +64,7 @@ export class AppointmentsService {
             60000,
       ),
       customer,
+      user,
       reminders: createAppointmentDto.reminders.map((reminder) =>
         this.reminderRepository.create({
           reminder_time: new Date(reminder.reminder_time),
