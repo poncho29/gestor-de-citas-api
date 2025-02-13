@@ -5,6 +5,8 @@ import {
   MinLength,
   Matches,
   MaxLength,
+  IsArray,
+  IsOptional,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -14,7 +16,7 @@ export class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsEmail()
+  @IsEmail({}, { message: 'El correo electrónico no es válido' })
   email: string;
 
   @IsString()
@@ -30,4 +32,9 @@ export class CreateUserDto {
       'La contraseña debe tener una letra mayúscula, una minúscula y un número.',
   })
   password: string;
+
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  roles?: string[];
 }

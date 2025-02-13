@@ -34,7 +34,7 @@ export class RemindersService {
       relations: [
         'appointment',
         'appointment.customer',
-        'appointment.customer.user',
+        'appointment.customer.enterprise',
       ],
       select: {
         id: true,
@@ -47,7 +47,7 @@ export class RemindersService {
           customer: {
             id: true,
             phone: true,
-            user: {
+            enterprise: {
               id: true,
               phone: true,
             },
@@ -82,7 +82,8 @@ export class RemindersService {
   private async sendReminder(reminder: Reminder) {
     const WHATSAPP_API_TOKEN =
       this.configService.get<string>('WHATSAPP_API_TOKEN');
-    const WHATSAPP_PHONE_NUMBER_ID = reminder.appointment.customer.user.phone;
+    const WHATSAPP_PHONE_NUMBER_ID =
+      reminder.appointment.customer.enterprise.phone;
 
     const customerPhone = reminder.appointment.customer.phone; // Número del cliente
 

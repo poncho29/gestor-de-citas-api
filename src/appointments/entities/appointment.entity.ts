@@ -10,10 +10,11 @@ import {
   OneToMany,
 } from 'typeorm';
 
+import { Enterprise } from '../../enterprise/entities/enterprise.entity';
 import { Customer } from '../../customers/entities/customer.entity';
 import { AppointmentService } from './appointment-service.entity';
 import { Reminder } from './reminder.entity';
-import { User } from '../../users/entities/user.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Entity('appointments')
 export class Appointment {
@@ -42,7 +43,12 @@ export class Appointment {
   deleted_at: Date;
 
   // Relations
-  @ManyToOne(() => User, (user) => user.appointments, { eager: true })
+  @ManyToOne(() => Enterprise, (enterprise) => enterprise.appointments)
+  enterprise: Enterprise;
+
+  @ManyToOne(() => User, (user) => user.appointments, {
+    eager: true,
+  })
   user: User;
 
   @ManyToOne(() => Customer, (customer) => customer.appointments)

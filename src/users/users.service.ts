@@ -60,7 +60,6 @@ export class UsersService {
   async findOne(id: string) {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: { customers: true },
       withDeleted: true,
     });
 

@@ -1,11 +1,48 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+
+import { Repository } from 'typeorm';
+
+import { Enterprise } from './entities/enterprise.entity';
+
+import { UsersService } from '../users/users.service';
+
 import { CreateEnterpriseDto } from './dto/create-enterprise.dto';
 import { UpdateEnterpriseDto } from './dto/update-enterprise.dto';
 
+import { handleDBErrors } from '../helpers';
+
+import { ValidRoles } from '../auth/interfaces';
+
 @Injectable()
 export class EnterpriseService {
-  create(createEnterpriseDto: CreateEnterpriseDto) {
-    return 'This action adds a new enterprise';
+  constructor(
+    @InjectRepository(Enterprise)
+    private readonly enterpriseRepository: Repository<Enterprise>,
+
+    private readonly userService: UsersService,
+  ) {}
+
+  async create(createEnterpriseDto: CreateEnterpriseDto) {
+    try {
+      const { user, ...restData } = createEnterpriseDto;
+
+      const adminUser = await this.userService.create({
+        ...user,
+        roles: [ValidRoles.ADMIN],
+      });
+
+      const enterprise = this.enterpriseRepository.create({
+        ...restData,
+        users: [adminUser],
+      });
+
+      await this.enterpriseRepository.save(enterprise);
+
+      return enterprise;
+    } catch (error) {
+      handleDBErrors(error);
+    }
   }
 
   findAll() {
