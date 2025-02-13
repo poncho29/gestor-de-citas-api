@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 
 import { AppointmentService } from '../../appointments/entities/appointment-service.entity';
-import { User } from '../../users/entities/user.entity';
+import { Enterprise } from '../../enterprise/entities/enterprise.entity';
 
 @Entity({ name: 'services' })
 export class Service {
@@ -45,9 +45,9 @@ export class Service {
   user_id: string;
 
   // Relations
-  @ManyToOne(() => User, (user) => user.customers)
-  @JoinColumn({ name: 'user_id' })
-  user: User;
+  @ManyToOne(() => Enterprise, (enterprise) => enterprise.services)
+  @JoinColumn()
+  enterprise: Enterprise;
 
   @OneToMany(
     () => AppointmentService,

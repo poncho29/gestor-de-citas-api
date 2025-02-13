@@ -8,11 +8,14 @@ import {
   DeleteDateColumn,
   BeforeInsert,
   BeforeUpdate,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 
-import { Customer } from '../../customers/entities/customer.entity';
-import { Service } from '../../services/entities/service.entity';
 import { Appointment } from '../../appointments/entities/appointment.entity';
+import { Enterprise } from '../../enterprise/entities/enterprise.entity';
+// import { Customer } from '../../customers/entities/customer.entity';
+// import { Service } from '../../services/entities/service.entity';
 
 @Entity('users')
 export class User {
@@ -25,7 +28,7 @@ export class User {
   @Column({ type: 'varchar', length: 255, unique: true })
   email: string;
 
-  @Column({ type: 'varchar', length: 20, unique: true })
+  @Column({ type: 'varchar', length: 20 })
   phone: string;
 
   @Column({ type: 'varchar', length: 255 })
@@ -47,14 +50,18 @@ export class User {
   deleted_at: Date;
 
   // Relations
-  @OneToMany(() => Service, (service) => service.user)
-  services: Service[];
-
-  @OneToMany(() => Customer, (customer) => customer.user)
-  customers: Customer[];
+  @ManyToOne(() => Enterprise, (enterprise) => enterprise.users)
+  @JoinColumn()
+  enterprise: Enterprise;
 
   @OneToMany(() => Appointment, (appointment) => appointment.user)
   appointments: Appointment;
+
+  // @OneToMany(() => Service, (service) => service.user)
+  // services: Service[];
+
+  // @OneToMany(() => Customer, (customer) => customer.user)
+  // customers: Customer[];
 
   // Functions
   @BeforeInsert()

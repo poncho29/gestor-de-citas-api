@@ -10,8 +10,8 @@ import {
   OneToMany,
 } from 'typeorm';
 
-import { User } from '../../users/entities/user.entity';
 import { Appointment } from '../../appointments/entities/appointment.entity';
+import { Enterprise } from '../../enterprise/entities/enterprise.entity';
 
 @Entity('customers')
 export class Customer {
@@ -40,9 +40,9 @@ export class Customer {
   deleted_at: Date;
 
   // Relations
-  @ManyToOne(() => User, (user) => user.customers)
-  @JoinColumn({ name: 'user_id' })
-  user: User;
+  @ManyToOne(() => Enterprise, (enterprise) => enterprise.customers)
+  @JoinColumn()
+  enterprise: Enterprise;
 
   @OneToMany(() => Appointment, (appointment) => appointment.customer)
   appointments: Appointment[];

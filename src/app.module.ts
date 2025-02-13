@@ -11,6 +11,7 @@ import { CustomersModule } from './customers/customers.module';
 import { UsersModule } from './users/users.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { AuthModule } from './auth/auth.module';
+import { EnterpriseModule } from './enterprise/enterprise.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AuthModule } from './auth/auth.module';
     UsersModule,
     AppointmentsModule,
     AuthModule,
+    EnterpriseModule,
   ],
   controllers: [],
   providers: [],
