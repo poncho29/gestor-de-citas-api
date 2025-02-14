@@ -46,7 +46,7 @@ export class Service {
 
   // Relations
   @ManyToOne(() => Enterprise, (enterprise) => enterprise.services)
-  @JoinColumn()
+  @JoinColumn({ name: 'enterprise_id' })
   enterprise: Enterprise;
 
   @OneToMany(

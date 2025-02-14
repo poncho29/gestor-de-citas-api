@@ -12,21 +12,30 @@ import {
 
 import { ServicesService } from './services.service';
 
+import { Auth, GetUser } from '../auth/decorators';
+
+import { User } from '../users/entities/user.entity';
+
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { PaginationDto } from '../common/dtos';
 
+import { ValidRoles } from '../auth/interfaces';
+
 @Controller('services')
+@Auth(ValidRoles.SUPER_ADMIN, ValidRoles.ADMIN)
 export class ServicesController {
   constructor(private readonly servicesService: ServicesService) {}
 
   @Post()
-  create(@Body() createServiceDto: CreateServiceDto) {
+  create(@Body() createServiceDto: CreateServiceDto, @GetUser() user: User) {
+    console.log(user);
     return this.servicesService.create(createServiceDto);
   }
 
   @Get()
-  findAll(@Query() pagination: PaginationDto) {
+  findAll(@GetUser() user: User, @Query() pagination: PaginationDto) {
+    console.log(user);
     return this.servicesService.findAll(pagination);
   }
 
