@@ -99,6 +99,8 @@ export class UsersService {
 
   async remove(id: string) {
     const user = await this.findOne(id);
-    return await this.userRepository.softRemove(user);
+    await this.userRepository.softRemove(user);
+
+    return { ok: true, message: 'Usuario eliminado correctamente.' };
   }
 }

@@ -14,8 +14,6 @@ import {
 
 import { Appointment } from '../../appointments/entities/appointment.entity';
 import { Enterprise } from '../../enterprise/entities/enterprise.entity';
-// import { Customer } from '../../customers/entities/customer.entity';
-// import { Service } from '../../services/entities/service.entity';
 
 @Entity('users')
 export class User {
@@ -56,12 +54,6 @@ export class User {
 
   @OneToMany(() => Appointment, (appointment) => appointment.user)
   appointments: Appointment;
-
-  // @OneToMany(() => Service, (service) => service.user)
-  // services: Service[];
-
-  // @OneToMany(() => Customer, (customer) => customer.user)
-  // customers: Customer[];
 
   // Functions
   @BeforeInsert()

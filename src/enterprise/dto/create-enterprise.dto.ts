@@ -1,6 +1,7 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   MinLength,
   ValidateNested,
@@ -29,4 +30,8 @@ export class CreateEnterpriseDto {
   @Type(() => CreateUserDto)
   @IsNotEmpty()
   user: CreateUserDto;
+
+  @IsString()
+  @IsOptional()
+  deleted_at?: string;
 }
