@@ -84,7 +84,6 @@ export class EnterpriseService {
   async findOne(id: string) {
     const enterprise = await this.enterpriseRepository.findOne({
       where: { id },
-      relations: ['users', 'customers', 'services', 'appointments'],
       withDeleted: true,
     });
 

@@ -21,26 +21,29 @@ import { PaginationDto } from '../common/dtos';
 import { ValidRoles } from '../auth/interfaces';
 
 @Controller('enterprise')
-@Auth(ValidRoles.SUPER_ADMIN)
 export class EnterpriseController {
   constructor(private readonly enterpriseService: EnterpriseService) {}
 
   @Post()
+  @Auth(ValidRoles.SUPER_ADMIN)
   create(@Body() createEnterpriseDto: CreateEnterpriseDto) {
     return this.enterpriseService.create(createEnterpriseDto);
   }
 
   @Get()
+  @Auth(ValidRoles.SUPER_ADMIN)
   findAll(@Query() pagination: PaginationDto) {
     return this.enterpriseService.findAll(pagination);
   }
 
   @Get(':id')
+  @Auth(ValidRoles.SUPER_ADMIN)
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.enterpriseService.findOne(id);
   }
 
   @Patch(':id')
+  @Auth(ValidRoles.SUPER_ADMIN)
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateEnterpriseDto: UpdateEnterpriseDto,
@@ -49,6 +52,7 @@ export class EnterpriseController {
   }
 
   @Delete(':id')
+  @Auth(ValidRoles.SUPER_ADMIN)
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.enterpriseService.remove(id);
   }
