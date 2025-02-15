@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 
 import { DataSource, FindManyOptions, ILike, Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 import { Enterprise } from './entities/enterprise.entity';
-
-import { UsersService } from '../users/users.service';
+import { User } from '../users/entities/user.entity';
 
 import { CreateEnterpriseDto } from './dto/create-enterprise.dto';
 import { UpdateEnterpriseDto } from './dto/update-enterprise.dto';
@@ -22,29 +22,40 @@ export class EnterpriseService {
 
     @InjectRepository(Enterprise)
     private readonly enterpriseRepository: Repository<Enterprise>,
-
-    private readonly userService: UsersService,
   ) {}
 
   async create(createEnterpriseDto: CreateEnterpriseDto) {
     const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
     try {
       const { user, ...restData } = createEnterpriseDto;
+      const { password, ...restUser } = user;
 
-      const adminUser = await this.userService.create(null, {
-        ...user,
+      const adminUser = queryRunner.manager.create(User, {
+        ...restUser,
+        password: await bcrypt.hash(password, 10),
         roles: [ValidRoles.ADMIN],
       });
 
-      const enterprise = this.enterpriseRepository.create({
+      await queryRunner.manager.save(adminUser);
+
+      const enterprise = queryRunner.manager.create(Enterprise, {
         ...restData,
         users: [adminUser],
       });
 
-      await this.enterpriseRepository.save(enterprise);
+      await queryRunner.manager.save(enterprise);
+
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
 
       return enterprise;
     } catch (error) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+
       handleDBErrors(error);
     }
   }
@@ -85,8 +96,6 @@ export class EnterpriseService {
   async update(id: string, updateEnterpriseDto: UpdateEnterpriseDto) {
     try {
       delete updateEnterpriseDto.user;
-
-      console.log(updateEnterpriseDto);
 
       const enterprise = await this.findOne(id);
       Object.assign(enterprise, updateEnterpriseDto);
