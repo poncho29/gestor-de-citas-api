@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 
-import { FindManyOptions, ILike, Repository } from 'typeorm';
+import { DataSource, FindManyOptions, ILike, Repository } from 'typeorm';
 
 import { Enterprise } from './entities/enterprise.entity';
 
@@ -18,6 +18,8 @@ import { ValidRoles } from '../auth/interfaces';
 @Injectable()
 export class EnterpriseService {
   constructor(
+    @InjectDataSource() private dataSource: DataSource,
+
     @InjectRepository(Enterprise)
     private readonly enterpriseRepository: Repository<Enterprise>,
 
@@ -25,10 +27,11 @@ export class EnterpriseService {
   ) {}
 
   async create(createEnterpriseDto: CreateEnterpriseDto) {
+    const queryRunner = this.dataSource.createQueryRunner();
     try {
       const { user, ...restData } = createEnterpriseDto;
 
-      const adminUser = await this.userService.create({
+      const adminUser = await this.userService.create(null, {
         ...user,
         roles: [ValidRoles.ADMIN],
       });

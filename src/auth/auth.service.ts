@@ -5,6 +5,8 @@ import * as bcrypt from 'bcrypt';
 
 import { UsersService } from '../users/users.service';
 
+import { User } from '../users/entities/user.entity';
+
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 
@@ -18,16 +20,16 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(createUserDto: CreateUserDto) {
-    const user = await this.userService.create(createUserDto);
+  async register(user: User, createUserDto: CreateUserDto) {
+    const newUser = await this.userService.create(user, createUserDto);
 
-    delete user.created_at;
-    delete user.updated_at;
-    delete user.deleted_at;
+    delete newUser.created_at;
+    delete newUser.updated_at;
+    delete newUser.deleted_at;
 
     return {
-      ...user,
-      token: this.getJwtToken({ id: user.id }),
+      ...newUser,
+      token: this.getJwtToken({ id: newUser.id }),
     };
   }
 

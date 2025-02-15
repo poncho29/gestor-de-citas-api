@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { FindManyOptions, ILike, Repository } from 'typeorm';
@@ -19,19 +23,33 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(user: User | null = null, createUserDto: CreateUserDto) {
     try {
-      const { password, ...userData } = createUserDto;
-
-      const user = this.userRepository.create({
-        ...userData,
-        password: bcrypt.hashSync(password, 10),
+      const userExists = await this.userRepository.findOne({
+        where: { email: createUserDto.email },
+        withDeleted: true,
+        select: { id: true, email: true, deleted_at: true },
       });
 
-      await this.userRepository.save(user);
-      delete user.password;
+      if (userExists) {
+        if (userExists.deleted_at)
+          throw new ConflictException('El usuario existe pero esta inactivo.');
 
-      return user;
+        throw new NotFoundException('Ya existe un usuario con ese email.');
+      }
+
+      const { password, ...userData } = createUserDto;
+
+      const newUser = this.userRepository.create({
+        ...userData,
+        password: bcrypt.hashSync(password, 10),
+        enterprise: user?.enterprise,
+      });
+
+      await this.userRepository.save(newUser);
+      delete newUser.password;
+
+      return newUser;
     } catch (error) {
       handleDBErrors(error);
     }
@@ -73,7 +91,7 @@ export class UsersService {
     const user = await this.userRepository.findOne({
       where: { email },
       withDeleted: true,
-      select: { id: true, email: true, password: true },
+      select: { id: true, email: true, password: true, deleted_at: true },
     });
 
     if (!user)
