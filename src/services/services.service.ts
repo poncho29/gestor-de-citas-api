@@ -16,6 +16,8 @@ import { PaginationDto } from '../common/dtos';
 
 import { handleDBErrors } from '../helpers';
 
+import { ValidRoles } from '../auth/interfaces';
+
 @Injectable()
 export class ServicesService {
   constructor(
@@ -23,12 +25,12 @@ export class ServicesService {
     private readonly serviceRepository: Repository<Service>,
   ) {}
 
-  async create(createServiceDto: CreateServiceDto, user: User) {
+  async create(user: User, createServiceDto: CreateServiceDto) {
     try {
       const existingService = await this.serviceRepository.findOne({
         where: {
           name: createServiceDto.name.toLowerCase().trim(),
-          enterprise: { id: user.enterprise.id },
+          enterprise: { id: user?.enterprise?.id },
         },
       });
 
@@ -46,14 +48,21 @@ export class ServicesService {
     }
   }
 
-  async findAll(pagination: PaginationDto) {
+  async findAll(user: User, pagination: PaginationDto) {
     const { limit = 10, offset = 0, search = '', byUserId = '' } = pagination;
 
     const findOptions: FindManyOptions<Service> = {
       take: limit,
       skip: offset,
       order: { id: 'ASC' },
+      where: {
+        enterprise: { id: user?.enterprise?.id },
+      },
     };
+
+    if (user.roles.includes(ValidRoles.SUPER_ADMIN)) {
+      delete findOptions.where;
+    }
 
     if (search) {
       findOptions.where = {
@@ -74,8 +83,14 @@ export class ServicesService {
     return { services, total };
   }
 
-  async findOne(id: string) {
-    const service = await this.serviceRepository.findOneBy({ id });
+  async findOne(user: User, id: string) {
+    const service = await this.serviceRepository.findOne({
+      where: {
+        id,
+        enterprise: { id: user?.enterprise?.id },
+      },
+      withDeleted: true,
+    });
 
     if (!service)
       throw new NotFoundException(`El servicio con id ${id} no se encontro`);
@@ -83,9 +98,9 @@ export class ServicesService {
     return service;
   }
 
-  async update(id: string, updateServiceDto: UpdateServiceDto) {
+  async update(user: User, id: string, updateServiceDto: UpdateServiceDto) {
     try {
-      const service = await this.findOne(id);
+      const service = await this.findOne(user, id);
       Object.assign(service, updateServiceDto);
 
       return await this.serviceRepository.save(service);
@@ -94,8 +109,10 @@ export class ServicesService {
     }
   }
 
-  async remove(id: string) {
-    const service = await this.findOne(id);
-    return await this.serviceRepository.softRemove(service);
+  async remove(user: User, id: string) {
+    const service = await this.findOne(user, id);
+    await this.serviceRepository.softRemove(service);
+
+    return { ok: true, message: 'Servicio eliminado correctamente.' };
   }
 }

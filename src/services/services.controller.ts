@@ -28,31 +28,31 @@ export class ServicesController {
   constructor(private readonly servicesService: ServicesService) {}
 
   @Post()
-  create(@Body() createServiceDto: CreateServiceDto, @GetUser() user: User) {
-    return this.servicesService.create(createServiceDto, user);
+  create(@GetUser() user: User, @Body() createServiceDto: CreateServiceDto) {
+    return this.servicesService.create(user, createServiceDto);
   }
 
   @Get()
   findAll(@GetUser() user: User, @Query() pagination: PaginationDto) {
-    console.log(user);
-    return this.servicesService.findAll(pagination);
+    return this.servicesService.findAll(user, pagination);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.servicesService.findOne(id);
+  findOne(@GetUser() user: User, @Param('id', ParseUUIDPipe) id: string) {
+    return this.servicesService.findOne(user, id);
   }
 
   @Patch(':id')
   update(
+    @GetUser() user: User,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateServiceDto: UpdateServiceDto,
   ) {
-    return this.servicesService.update(id, updateServiceDto);
+    return this.servicesService.update(user, id, updateServiceDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.servicesService.remove(id);
+  remove(@GetUser() user: User, @Param('id', ParseUUIDPipe) id: string) {
+    return this.servicesService.remove(user, id);
   }
 }
