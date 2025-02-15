@@ -23,26 +23,29 @@ import { PaginationDto } from '../common/dtos';
 import { ValidRoles } from '../auth/interfaces';
 
 @Controller('users')
-@Auth(ValidRoles.SUPER_ADMIN, ValidRoles.ADMIN)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @Auth(ValidRoles.SUPER_ADMIN, ValidRoles.ADMIN)
   create(@GetUser() user: User, @Body() createUserDto: CreateUserDto) {
     return this.usersService.create(user, createUserDto);
   }
 
   @Get()
-  findAll(@Query() pagination: PaginationDto) {
-    return this.usersService.findAll(pagination);
+  @Auth(ValidRoles.SUPER_ADMIN, ValidRoles.ADMIN)
+  findAll(@GetUser() user: User, @Query() pagination: PaginationDto) {
+    return this.usersService.findAll(user, pagination);
   }
 
   @Get(':id')
+  @Auth(ValidRoles.SUPER_ADMIN, ValidRoles.ADMIN)
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.findOne(id);
   }
 
   @Patch(':id')
+  @Auth(ValidRoles.SUPER_ADMIN, ValidRoles.ADMIN)
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -51,6 +54,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @Auth(ValidRoles.SUPER_ADMIN, ValidRoles.ADMIN)
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.remove(id);
   }

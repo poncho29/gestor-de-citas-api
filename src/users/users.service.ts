@@ -1,11 +1,12 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { FindManyOptions, ILike, Repository } from 'typeorm';
+import { FindManyOptions, ILike, Not, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 import { User } from './entities/user.entity';
@@ -16,6 +17,8 @@ import { PaginationDto } from '../common/dtos';
 
 import { handleDBErrors } from '../helpers';
 
+import { ROLE_PERMISSIONS, ValidRoles } from '../auth/interfaces';
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -24,9 +27,15 @@ export class UsersService {
   ) {}
 
   async create(user: User | null = null, createUserDto: CreateUserDto) {
+    const { password, roles, ...userData } = createUserDto;
+
+    if (user && roles) {
+      this.validateRoles(user.roles as ValidRoles[], roles as ValidRoles[]);
+    }
+
     try {
       const userExists = await this.userRepository.findOne({
-        where: { email: createUserDto.email },
+        where: { email: userData.email },
         withDeleted: true,
         select: { id: true, email: true, deleted_at: true },
       });
@@ -37,8 +46,6 @@ export class UsersService {
 
         throw new NotFoundException('Ya existe un usuario con ese email.');
       }
-
-      const { password, ...userData } = createUserDto;
 
       const newUser = this.userRepository.create({
         ...userData,
@@ -55,13 +62,17 @@ export class UsersService {
     }
   }
 
-  async findAll(pagination: PaginationDto) {
+  async findAll(user: User, pagination: PaginationDto) {
     const { limit = 10, offset = 0, search = '' } = pagination;
 
     const findOptions: FindManyOptions<User> = {
       take: limit,
       skip: offset,
       order: { id: 'ASC' },
+      where: {
+        enterprise: { id: user?.enterprise?.id },
+        id: Not(user.id),
+      },
     };
 
     if (search) {
@@ -121,5 +132,34 @@ export class UsersService {
     await this.userRepository.softRemove(user);
 
     return { ok: true, message: 'Usuario eliminado correctamente.' };
+  }
+
+  // Helpers
+  private validateRoles(
+    creatorRoles: ValidRoles[],
+    newUserRoles: ValidRoles[],
+  ) {
+    // Determinamos el nivel más alto de rol del creador
+    const isCreatorSuperAdmin = creatorRoles.includes(ValidRoles.SUPER_ADMIN);
+    const isCreatorAdmin = creatorRoles.includes(ValidRoles.ADMIN);
+
+    // Obtenemos los roles permitidos según el rol del creador
+    const allowedRoles = isCreatorSuperAdmin
+      ? ROLE_PERMISSIONS[ValidRoles.SUPER_ADMIN]
+      : isCreatorAdmin
+        ? ROLE_PERMISSIONS[ValidRoles.ADMIN]
+        : [];
+
+    // Verificamos si todos los roles nuevos están permitidos
+    const hasInvalidRoles = newUserRoles.some(
+      (role) => !allowedRoles.includes(role),
+    );
+
+    if (hasInvalidRoles) {
+      throw new ForbiddenException(
+        `No tienes permisos para asignar algunos de los roles proporcionados.
+        Roles permitidos: ${allowedRoles.join(', ')}`,
+      );
+    }
   }
 }
