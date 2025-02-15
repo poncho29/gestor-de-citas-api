@@ -29,8 +29,7 @@ export class ServicesController {
 
   @Post()
   create(@Body() createServiceDto: CreateServiceDto, @GetUser() user: User) {
-    console.log(user);
-    return this.servicesService.create(createServiceDto);
+    return this.servicesService.create(createServiceDto, user);
   }
 
   @Get()

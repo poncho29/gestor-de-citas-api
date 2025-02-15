@@ -1,4 +1,6 @@
 import {
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
@@ -54,4 +56,15 @@ export class Service {
     (appointmentService) => appointmentService.service,
   )
   appointmentServices: AppointmentService[];
+
+  // Functions
+  @BeforeInsert()
+  checkFieldsBeforeInsert() {
+    this.name = this.name.toLowerCase().trim();
+  }
+
+  @BeforeUpdate()
+  checkFieldsBeforeUpdate() {
+    this.checkFieldsBeforeInsert();
+  }
 }

@@ -60,6 +60,7 @@ export class UsersService {
   async findOne(id: string) {
     const user = await this.userRepository.findOne({
       where: { id },
+      relations: ['enterprise'],
       withDeleted: true,
     });
 

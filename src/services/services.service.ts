@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { FindManyOptions, ILike, Repository } from 'typeorm';
 
+import { User } from '../users/entities/user.entity';
 import { Service } from './entities/service.entity';
 
 import { CreateServiceDto } from './dto/create-service.dto';
@@ -22,19 +23,23 @@ export class ServicesService {
     private readonly serviceRepository: Repository<Service>,
   ) {}
 
-  async create(createServiceDto: CreateServiceDto) {
+  async create(createServiceDto: CreateServiceDto, user: User) {
     try {
       const existingService = await this.serviceRepository.findOne({
         where: {
-          name: createServiceDto.name,
-          user_id: createServiceDto.user_id,
+          name: createServiceDto.name.toLowerCase().trim(),
+          enterprise: { id: user.enterprise.id },
         },
       });
 
       if (existingService)
         throw new ConflictException('Ya existe un servicio con ese nombre');
 
-      const service = this.serviceRepository.create(createServiceDto);
+      const service = this.serviceRepository.create({
+        ...createServiceDto,
+        user_id: user.id,
+        enterprise: user.enterprise,
+      });
       return await this.serviceRepository.save(service);
     } catch (error) {
       handleDBErrors(error, { message: 'un servicio', field: 'nombre' });
