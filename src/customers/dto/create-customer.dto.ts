@@ -20,8 +20,4 @@ export class CreateCustomerDto {
   @IsEmail()
   @IsOptional()
   email?: string;
-
-  @IsString()
-  @IsNotEmpty()
-  user_id: string;
 }
