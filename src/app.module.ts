@@ -5,13 +5,14 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 import { typeOrmConfig } from './config/typeorm.config';
 
-import { CommonModule } from './common/common.module';
-import { ServicesModule } from './services/services.module';
-import { CustomersModule } from './customers/customers.module';
-import { UsersModule } from './users/users.module';
 import { AppointmentsModule } from './appointments/appointments.module';
-import { AuthModule } from './auth/auth.module';
 import { EnterpriseModule } from './enterprise/enterprise.module';
+import { CustomersModule } from './customers/customers.module';
+import { ServicesModule } from './services/services.module';
+import { CommonModule } from './common/common.module';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
@@ -25,12 +26,13 @@ import { EnterpriseModule } from './enterprise/enterprise.module';
     }),
     ScheduleModule.forRoot(),
     CommonModule,
-    ServicesModule,
-    CustomersModule,
-    UsersModule,
+    SeedModule,
     AppointmentsModule,
-    AuthModule,
     EnterpriseModule,
+    CustomersModule,
+    ServicesModule,
+    UsersModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
