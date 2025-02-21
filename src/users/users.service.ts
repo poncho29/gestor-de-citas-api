@@ -107,7 +107,6 @@ export class UsersService {
     const user = await this.userRepository.findOne({
       where: { email },
       withDeleted: true,
-      select: { id: true, email: true, deleted_at: true },
     });
 
     if (!user)
@@ -118,8 +117,7 @@ export class UsersService {
         `El usuario con email ${email} esta inactivo.`,
       );
 
-    delete user.email;
-    delete user.deleted_at;
+    delete user.password;
 
     return user;
   }
