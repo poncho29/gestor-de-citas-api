@@ -23,10 +23,6 @@ export class AuthService {
   async register(user: User, createUserDto: CreateUserDto) {
     const newUser = await this.userService.create(user, createUserDto);
 
-    delete newUser.created_at;
-    delete newUser.updated_at;
-    delete newUser.deleted_at;
-
     return {
       ...newUser,
       token: this.getJwtToken({ id: newUser.id }),
@@ -43,8 +39,13 @@ export class AuthService {
     if (!bcrypt.compareSync(password, user.password))
       throw new UnauthorizedException('Credenciales no validas');
 
-    delete user.password;
+    return {
+      ...user,
+      token: this.getJwtToken({ id: user.id }),
+    };
+  }
 
+  async validateToken(user: User) {
     return {
       ...user,
       token: this.getJwtToken({ id: user.id }),

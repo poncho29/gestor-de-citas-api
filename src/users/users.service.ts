@@ -49,11 +49,16 @@ export class UsersService {
 
       const newUser = this.userRepository.create({
         ...userData,
+        roles: roles as ValidRoles[],
         password: bcrypt.hashSync(password, 10),
         enterprise: user?.enterprise,
       });
 
       await this.userRepository.save(newUser);
+
+      delete newUser.created_at;
+      delete newUser.updated_at;
+      delete newUser.deleted_at;
       delete newUser.password;
 
       return newUser;
@@ -102,7 +107,7 @@ export class UsersService {
     const user = await this.userRepository.findOne({
       where: { email },
       withDeleted: true,
-      select: { id: true, email: true, password: true, deleted_at: true },
+      select: { id: true, email: true, deleted_at: true },
     });
 
     if (!user)
@@ -112,6 +117,9 @@ export class UsersService {
       throw new NotFoundException(
         `El usuario con email ${email} esta inactivo.`,
       );
+
+    delete user.email;
+    delete user.deleted_at;
 
     return user;
   }

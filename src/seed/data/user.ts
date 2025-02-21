@@ -9,7 +9,7 @@ export type TUser = {
 export const users = [
   {
     name: 'Sebastian Meneses',
-    email: 'semeneses@gmail.com',
+    email: 'smeneses@gmail.com',
     phone: '+573187395386',
     password: 'Superadmin1.',
     roles: ['super-admin'],
