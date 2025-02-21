@@ -24,26 +24,16 @@ export const enterpises: TEnterprise[] = [
       roles: ['admin'],
     },
   },
-  // {
-  //   name: 'Empresa 2',
-  //   email: 'empresa2@gmail.com',
-  //   phone: '+15551456887',
-  //   user: {
-  //     name: 'Luisa Ardila',
-  //     email: 'lardila@gmail.com',
-  //     password: 'Lardila2+',
-  //     role: 'admin',
-  //   },
-  // },
-  // {
-  //   name: 'Empresa 3',
-  //   email: 'empresa3@gmail.com',
-  //   phone: '+15551456887',
-  //   user: {
-  //     name: 'Diego Lopez',
-  //     email: 'dlopez@gmail.com',
-  //     password: 'Dlopez3+',
-  //     role: 'admin',
-  //   },
-  // },
+  {
+    name: 'Empresa 2',
+    email: 'empresa2@gmail.com',
+    phone: '+573205559062',
+    user: {
+      name: 'Luisa Ardila',
+      email: 'lardila@gmail.com',
+      password: 'Lardila2+',
+      phone: '+573205559062',
+      roles: ['admin'],
+    },
+  },
 ];

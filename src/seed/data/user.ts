@@ -11,14 +11,14 @@ export const users = [
     name: 'Sebastian Meneses',
     email: 'semeneses@gmail.com',
     phone: '+573187395386',
-    password: 'Sebas29',
+    password: 'Superadmin1.',
     roles: ['super-admin'],
   },
   {
     name: 'Sergio Picon',
     email: 'spicon@gmail.com',
-    phone: '+573187395386',
-    password: 'Sebas29',
+    phone: '+573203439111',
+    password: 'Superadmin1.',
     roles: ['super-admin'],
   },
 ];

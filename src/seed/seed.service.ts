@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 
 import { DataSource, Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 import { Enterprise } from '../enterprise/entities/enterprise.entity';
 import { Customer } from '../customers/entities/customer.entity';
@@ -44,73 +45,98 @@ export class SeedService {
       );
     }
 
-    console.log('Dropping database...');
-
     await this.dataSource.dropDatabase();
     await this.dataSource.synchronize();
-
-    console.log('Running seed...');
 
     await this.insertEnterprises();
     await this.insertUsers();
     await this.insertCustomers();
-    // await this.insertServices();
+    await this.insertServices();
 
     return 'Seed ejecutado correctamente';
   }
 
   async insertEnterprises(): Promise<void> {
-    enterpises.forEach(async (enterprise) => {
-      const admin = this.userRepository.create(enterprise.user);
+    const enterprisePromises = enterpises.map(async (enterprise) => {
+      const { user, ...restEnterprise } = enterprise;
+      const { password, ...restUser } = user;
+
+      const admin = this.userRepository.create({
+        ...restUser,
+        password: bcrypt.hashSync(password, 10),
+      });
+
       await this.userRepository.save(admin);
 
       const newEnterprise = this.enterpriseRepository.create({
-        ...enterprise,
+        ...restEnterprise,
         users: [admin],
       });
+
       await this.enterpriseRepository.save(newEnterprise);
     });
+
+    await Promise.all(enterprisePromises);
   }
 
   async insertUsers(): Promise<void> {
-    users.forEach(async (user) => {
-      const newUser = this.userRepository.create(user);
+    const userPromises = users.map(async (user) => {
+      const { password, ...restUser } = user;
+      const newUser = this.userRepository.create({
+        ...restUser,
+        password: bcrypt.hashSync(password, 10),
+      });
+
       await this.userRepository.save(newUser);
     });
+
+    await Promise.all(userPromises);
   }
 
   async insertCustomers(): Promise<void> {
-    const enterprise = await this.enterpriseRepository.findOneBy({
-      email: 'empresa1@gmail.com',
-    });
+    const customerPromises = customers.map(async (customer) => {
+      // Busca la empresa asociada al cliente
+      const enterprise = await this.enterpriseRepository.findOne({
+        where: { email: customer.enterpriseEmail },
+        relations: ['users'],
+      });
 
-    console.log('customers', enterprise);
+      if (!enterprise) {
+        throw new Error(
+          `Empresa no encontrada para el cliente: ${customer.name}`,
+        );
+      }
 
-    customers.forEach(async (customer) => {
+      // Crea el cliente y lo asocia con su empres y usuario
       const newCustomer = this.customerRepository.create({
         ...customer,
         user_id: enterprise.users[0].id,
-        // enterprise,
+        enterprise,
       });
+
       await this.customerRepository.save(newCustomer);
     });
+
+    await Promise.all(customerPromises);
   }
 
   async insertServices(): Promise<void> {
-    const newServices: Service[] = [];
-
-    const enterprise = await this.enterpriseRepository.findOne({
-      where: { email: 'empresa1@gmail.com' },
+    const enterprises = await this.enterpriseRepository.find({
+      relations: ['users'],
     });
 
-    services.forEach(async (service) => {
-      const newService = this.serviceRepository.create({
-        ...service,
-        user_id: enterprise.users[0].id,
-        enterprise,
+    const servicePromises = enterprises.flatMap((enterprise) => {
+      return services.map(async (service) => {
+        const newService = this.serviceRepository.create({
+          ...service,
+          user_id: enterprise.users[0].id,
+          enterprise,
+        });
+
+        await this.serviceRepository.save(newService);
       });
-      await this.serviceRepository.save(newService);
-      newServices.push(newService);
     });
+
+    await Promise.all(servicePromises);
   }
 }
