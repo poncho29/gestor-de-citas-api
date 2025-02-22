@@ -5,9 +5,12 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
+import { Subscription } from '../../subscriptions/entities/subscription.entity';
 
 @Entity('plans')
 export class Plan {
@@ -34,6 +37,10 @@ export class Plan {
 
   @DeleteDateColumn()
   deleted_at: Date;
+
+  // Relations
+  @OneToMany(() => Subscription, (subscription) => subscription.enterprise)
+  subscriptions: Subscription[];
 
   // Functions
   @BeforeInsert()

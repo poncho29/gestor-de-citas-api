@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { Subscription } from '../../subscriptions/entities/subscription.entity';
 import { Appointment } from '../../appointments/entities/appointment.entity';
 import { Customer } from '../../customers/entities/customer.entity';
 import { Service } from '../../services/entities/service.entity';
@@ -48,4 +49,7 @@ export class Enterprise {
 
   @OneToMany(() => Appointment, (appointment) => appointment.enterprise)
   appointments: Appointment;
+
+  @OneToMany(() => Subscription, (subscription) => subscription.enterprise)
+  subscriptions: Subscription[];
 }

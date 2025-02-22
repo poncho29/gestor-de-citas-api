@@ -27,4 +27,8 @@ export class CreatePlanDto {
   @IsInt()
   @Min(1)
   duration: number;
+
+  @IsString()
+  @IsOptional()
+  deleted_at?: string;
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 
 import { DataSource, FindManyOptions, ILike, Repository } from 'typeorm';
@@ -87,7 +87,8 @@ export class EnterpriseService {
       withDeleted: true,
     });
 
-    if (!enterprise) throw new Error(`Empresa con ID ${id} no existe.`);
+    if (!enterprise)
+      throw new NotFoundException(`Empresa con ID ${id} no existe.`);
 
     return enterprise;
   }

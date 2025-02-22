@@ -14,6 +14,7 @@ import { PlansModule } from './plans/plans.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { SeedModule } from './seed/seed.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { SeedModule } from './seed/seed.module';
     UsersModule,
     AuthModule,
     PlansModule,
+    SubscriptionsModule,
   ],
   controllers: [],
   providers: [],
