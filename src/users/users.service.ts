@@ -117,8 +117,6 @@ export class UsersService {
         `El usuario con email ${email} esta inactivo.`,
       );
 
-    delete user.password;
-
     return user;
   }
 

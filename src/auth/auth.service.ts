@@ -39,6 +39,8 @@ export class AuthService {
     if (!bcrypt.compareSync(password, user.password))
       throw new UnauthorizedException('Credenciales no validas');
 
+    delete user.password;
+
     return {
       ...user,
       token: this.getJwtToken({ id: user.id }),
