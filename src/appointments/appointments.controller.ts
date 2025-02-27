@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 
 import { Auth, GetUser } from '../auth/decorators';
@@ -16,15 +17,22 @@ import { AppointmentsService } from './appointments.service';
 
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
+import { PaginationDto } from '../common/dtos';
 
 import { ValidRoles } from '../auth/interfaces';
+
+const ADMIN_ROLES = [
+  ValidRoles.SUPER_ADMIN,
+  ValidRoles.ADMIN,
+  ValidRoles.SUB_ADMIN,
+];
 
 @Controller('appointments')
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
   @Post()
-  @Auth(ValidRoles.SUPER_ADMIN, ValidRoles.ADMIN)
+  @Auth(...ADMIN_ROLES)
   create(
     @Body() createAppointmentDto: CreateAppointmentDto,
     @GetUser() user: User,
@@ -33,16 +41,19 @@ export class AppointmentsController {
   }
 
   @Get()
-  findAll() {
-    return this.appointmentsService.findAll();
+  @Auth(...ADMIN_ROLES)
+  findAll(@GetUser() user: User, @Query() pagination: PaginationDto) {
+    return this.appointmentsService.findAll(user, pagination);
   }
 
   @Get(':id')
+  @Auth(...ADMIN_ROLES)
   findOne(@Param('id') id: string) {
     return this.appointmentsService.findOne(+id);
   }
 
   @Patch(':id')
+  @Auth(...ADMIN_ROLES)
   update(
     @Param('id') id: string,
     @Body() updateAppointmentDto: UpdateAppointmentDto,
@@ -51,6 +62,7 @@ export class AppointmentsController {
   }
 
   @Delete(':id')
+  @Auth(...ADMIN_ROLES)
   remove(@Param('id') id: string) {
     return this.appointmentsService.remove(+id);
   }

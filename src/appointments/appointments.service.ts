@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { In, Repository } from 'typeorm';
+import { FindManyOptions, In, Repository } from 'typeorm';
 
 import { AppointmentService } from './entities/appointment-service.entity';
 import { Customer } from '../customers/entities/customer.entity';
@@ -12,6 +12,7 @@ import { User } from '../users/entities/user.entity';
 
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
+import { PaginationDto } from '../common/dtos';
 
 @Injectable()
 export class AppointmentsService {
@@ -80,8 +81,23 @@ export class AppointmentsService {
     return savedAppointment;
   }
 
-  findAll() {
-    return `This action returns all appointments`;
+  async findAll(user: User, pagination: PaginationDto) {
+    const { limit = 10, offset = 0 } = pagination;
+
+    const findOptions: FindManyOptions<Appointment> = {
+      take: limit,
+      skip: offset,
+      order: { id: 'ASC' },
+      where: {
+        user: { id: user.id },
+        // enterprise: { id: user?.enterprise?.id },
+      },
+    };
+
+    const [appointments, total] =
+      await this.appointmentRepository.findAndCount(findOptions);
+
+    return { appointments, total };
   }
 
   findOne(id: number) {
